@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>easyTool - .htpasswd</title>
+  <title>easytool - .htpasswd</title>
   <style>
     body { font-family: sans-serif; text-align: center; margin-top: 30px; }
     input, button { margin: 5px; padding: 8px; font-size: 1em; }
@@ -46,7 +46,7 @@
         const user = usernames[i].value.trim();
         const pass = passwords[i].value;
         if (user && pass) {
-          const hash = apacheMD5(pass);
+          const hash = apache_md5(pass);
           result += `${user}:${hash}\n`;
         }
       }
