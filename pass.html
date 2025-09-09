@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>easyTool - .htpasswd</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 30px; }
+    input, button { margin: 5px; padding: 8px; font-size: 1em; }
+    .user-block { margin-bottom: 10px; }
+    #result { margin-top: 20px; font-family: monospace; white-space: pre-wrap; background: #f0f0f0; padding: 10px; }
+  </style>
+</head>
+<body>
+  <p><a href="index.html">HOME</a>&gt;.htpasswd 作成ツール</p>
+
+  <div id="userList">
+    <div class="user-block">
+      <input type="text" placeholder="ユーザー名" class="username">
+      <input type="password" placeholder="パスワード" class="password">
+    </div>
+  </div>
+
+  <button onclick="addUser()">＋ ユーザー追加</button>
+  <button onclick="generateHtpasswd()">✅ 生成する</button>
+
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/apache-md5@1.0.6/apache-md5.min.js"></script>
+  <script>
+    function addUser() {
+      const block = document.createElement("div");
+      block.className = "user-block";
+      block.innerHTML = `
+        <input type="text" placeholder="ユーザー名" class="username">
+        <input type="password" placeholder="パスワード" class="password">
+      `;
+      document.getElementById("userList").appendChild(block);
+    }
+
+    function generateHtpasswd() {
+      const usernames = document.querySelectorAll(".username");
+      const passwords = document.querySelectorAll(".password");
+      let result = "";
+
+      for (let i = 0; i < usernames.length; i++) {
+        const user = usernames[i].value.trim();
+        const pass = passwords[i].value;
+        if (user && pass) {
+          const hash = apacheMD5(pass);
+          result += `${user}:${hash}\n`;
+        }
+      }
+
+      if (result === "") {
+        alert("ユーザー名とパスワードを入力してください");
+        return;
+      }
+
+      document.getElementById("result").textContent = result;
+    }
+  </script>
+</body>
+</html>
