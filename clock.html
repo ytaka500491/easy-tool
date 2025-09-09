@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>easytool - 時計</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    canvas { background: #f0f0f0; border-radius: 50%; }
+    .section { margin: 30px 0; }
+    input, button { margin: 5px; padding: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>easy-tool</h2>
+  <p><a href="index.html">HOME</a>&gt;時計</p>
+  <!-- アナログ時計 -->
+  <div class="section">
+    <h2>🕰️ アナログ時計</h2>
+    <canvas id="analog" width="200" height="200"></canvas>
+  </div>
+
+  <!-- デジタル時計 -->
+  <div class="section">
+    <h2>⌚ デジタル時計</h2>
+    <div id="digital" style="font-size: 2em;"></div>
+  </div>
+
+  <!-- アラーム -->
+  <div class="section">
+    <h2>🔔 アラーム</h2>
+    <input type="time" id="alarmTime">
+    <button onclick="setAlarm()">セット</button>
+    <div id="alarmStatus"></div>
+  </div>
+
+  <!-- ストップウォッチ -->
+  <div class="section">
+    <h2>⏱️ ストップウォッチ</h2>
+    <div id="stopwatch">00:00:00</div>
+    <button onclick="startStopwatch()">スタート</button>
+    <button onclick="stopStopwatch()">ストップ</button>
+    <button onclick="resetStopwatch()">リセット</button>
+  </div>
+
+  <!-- タイマー -->
+  <div class="section">
+    <h2>⏲️ タイマー</h2>
+    <input type="number" id="timerInput" placeholder="秒数">
+    <button onclick="startTimer()">スタート</button>
+    <div id="timerDisplay">00</div>
+  </div>
+
+  <script>
+    // アナログ時計
+    const canvas = document.getElementById("analog");
+    const ctx = canvas.getContext("2d");
+    function drawAnalogClock() {
+      const now = new Date();
+      const sec = now.getSeconds();
+      const min = now.getMinutes();
+      const hr = now.getHours();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(100, 100, 90, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      // 時針
+      ctx.beginPath();
+      ctx.moveTo(100, 100);
+      ctx.lineTo(100 + 40 * Math.cos((hr % 12 + min / 60) * 30 * Math.PI / 180 - Math.PI / 2),
+                 100 + 40 * Math.sin((hr % 12 + min / 60) * 30 * Math.PI / 180 - Math.PI / 2));
+      ctx.stroke();
+
+      // 分針
+      ctx.beginPath();
+      ctx.moveTo(100, 100);
+      ctx.lineTo(100 + 60 * Math.cos((min + sec / 60) * 6 * Math.PI / 180 - Math.PI / 2),
+                 100 + 60 * Math.sin((min + sec / 60) * 6 * Math.PI / 180 - Math.PI / 2));
+      ctx.stroke();
+
+      // 秒針
+      ctx.beginPath();
+      ctx.moveTo(100, 100);
+      ctx.strokeStyle = "red";
+      ctx.lineTo(100 + 80 * Math.cos(sec * 6 * Math.PI / 180 - Math.PI / 2),
+                 100 + 80 * Math.sin(sec * 6 * Math.PI / 180 - Math.PI / 2));
+      ctx.stroke();
+      ctx.strokeStyle = "black";
+    }
+    setInterval(drawAnalogClock, 1000);
+
+    // デジタル時計
+    function updateDigitalClock() {
+      const now = new Date();
+      document.getElementById("digital").textContent =
+        now.toLocaleTimeString();
+    }
+    setInterval(updateDigitalClock, 1000);
+
+    // アラーム
+    let alarmTime = null;
+    function setAlarm() {
+      alarmTime = document.getElementById("alarmTime").value;
+      document.getElementById("alarmStatus").textContent = "アラームセット: " + alarmTime;
+    }
+    setInterval(() => {
+      const now = new Date();
+      const current = now.getHours().toString().padStart(2, "0") + ":" +
+                      now.getMinutes().toString().padStart(2, "0");
+      if (alarmTime === current) {
+        alert("🔔 アラームです！");
+        alarmTime = null;
+        document.getElementById("alarmStatus").textContent = "";
+      }
+    }, 1000);
+
+    // ストップウォッチ
+    let stopwatchTime = 0;
+    let stopwatchInterval = null;
+    function startStopwatch() {
+      if (!stopwatchInterval) {
+        stopwatchInterval = setInterval(() => {
+          stopwatchTime++;
+          const h = Math.floor(stopwatchTime / 3600);
+          const m = Math.floor((stopwatchTime % 3600) / 60);
+          const s = stopwatchTime % 60;
+          document.getElementById("stopwatch").textContent =
+            `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+        }, 1000);
+      }
+    }
+    function stopStopwatch() {
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+    }
+    function resetStopwatch() {
+      stopStopwatch();
+      stopwatchTime = 0;
+      document.getElementById("stopwatch").textContent = "00:00:00";
+    }
+
+    // タイマー
+    let timerInterval = null;
+    function startTimer() {
+      let time = parseInt(document.getElementById("timerInput").value);
+      document.getElementById("timerDisplay").textContent = time;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        time--;
+        document.getElementById("timerDisplay").textContent = time;
+        if (time <= 0) {
+          clearInterval(timerInterval);
+          alert("⏲️ タイマー終了！");
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
